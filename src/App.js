@@ -1,26 +1,49 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import styled from "styled-components";
 
-function App() {
+const Container = styled.div`
+  border: 1px solid red;
+`;
+
+const Title = styled.h1`
+  color: gray;
+`;
+
+const Button = styled.button`
+  background-color: ${({ success }) => (success ? "green" : "red")};
+`;
+
+const App = () => {
+  const [isActive, toggleActive] = useState(false);
+  const [initialTime, setInitialTime] = useState(0);
+
+  useEffect(() => {
+    let interval = null;
+    if (isActive) {
+      interval = setInterval(() => {
+        setInitialTime((prev) => prev + 1);
+      }, 1000);
+    } else if (!isActive && initialTime !== 0) {
+      clearInterval(interval);
+    }
+    return () => clearInterval(interval);
+  }, [isActive, initialTime]);
+
+  const handleReset = () => {
+    toggleActive(false);
+    setInitialTime(0);
+  };
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Container>
+      <Title>Timer: {initialTime}</Title>
+      <Button onClick={() => toggleActive((prev) => !prev)}>
+        {isActive ? "Pause" : "Start"}
+      </Button>
+      <Button onClick={handleReset}>Reset</Button>
+      {isActive && initialTime !== 0 ? <Button success>Record</Button> : null}
+    </Container>
   );
-}
+};
 
 export default App;
